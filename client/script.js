@@ -32,6 +32,12 @@ $(document).ready(() => {
     hideNotificationNumber();
   });
 
+  $chatHandlerButton.find('#instantMessage').click(() => {
+    $noAppContainer.show();
+    hideChatHandlerButton();
+    addReponsiveHeader();
+  });
+
   connectToNoAppSocket();
   initMessageReceiver();
   showChat();
