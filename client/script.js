@@ -14,6 +14,8 @@ let $chatHandlerButton;
 let $chatHeaderClose;
 let $head;
 let $responsiveHead;
+let isChatOpen = false;
+let hasLatestMessage = false;
 
 $(document).ready(() => {
   $body = $('body');
@@ -25,10 +27,13 @@ $(document).ready(() => {
     $noAppContainer.show();
     hideChatHandlerButton();
     addReponsiveHeader();
+    hideInstanceMessage();
+    hideNotificationNumber();
+    isChatOpen = true;
   });
 
   $chatHandlerButton.find('#closeNotification').click(() => {
-    $chatHandlerButton.find('#instantMessageWrapper').hide();
+    hideInstanceMessage();
     hideNotificationNumber();
   });
 
@@ -61,7 +66,7 @@ function connectToNoAppSocket() {
   if (location.protocol != 'https:') {
     proto = 'ws';
   }
-  var websock_uri = proto + '://localhost:13000';
+  var websock_uri = proto + '://CHANGEMEWSURI';
   noAppSocket = socket(websock_uri);
   console.log('Connected to', websock_uri);
   noAppSocket.emit('setup', {text: '', params: _noApp, clientcookie: getOrCreateCookie() });
@@ -80,13 +85,20 @@ function initMessageReceiver() {
 }
 
 function updateInstanceMessage(message) {
-  $chatHandlerButton.find('#instantMessage').text(message);
-  showInstanceMessage();
-  showNotificationNumber();
+  if (!isChatOpen && !hasLatestMessage) {
+    $chatHandlerButton.find('#instantMessage').text(message);
+    showInstanceMessage();
+    showNotificationNumber();
+    hasLatestMessage = true;
+  }
 }
 
 function showInstanceMessage() {
   $chatHandlerButton.find('#instantMessageWrapper').show();
+}
+
+function hideInstanceMessage() {
+  $chatHandlerButton.find('#instantMessageWrapper').hide();
 }
 
 function showNotificationNumber() {
@@ -215,5 +227,7 @@ function closeChat($closeElement) {
     $noAppContainer.hide();
     showChatHandlerButton();
     removeReponsiveHeader();
+    isChatOpen = false;
+    hasLatestMessage = false;
   });
 }
